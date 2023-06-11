@@ -646,3 +646,11 @@ footer .credit a {
     font-size: 55%;
   }
 }
+.row {
+  display: flex;
+  align-items: center; /* Align items vertically in the center */
+}
+
+.product-price {
+  margin-right: 10px; /* Add some spacing between the elements */
+}

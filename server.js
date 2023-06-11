@@ -137,6 +137,27 @@ mqttClient.on('reconnect', function () {
 
 mqttClient.on('message', function (topic, message) {
   console.log('Received message:', message.toString());
+
+  // Convert the MQTT message to a JSON object
+  const mqttData = JSON.parse(message.toString());
+
+  // Extract the necessary data from the MQTT message
+  const dataToSave = mqttData.dataToSave;
+
+  // Prepare the SQL query to insert the data into the database
+  const query = `INSERT INTO data_realtime (realtime) VALUES (?)`;
+  const values = [dataToSave];
+
+  // Execute the SQL query
+  connection.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      return;
+    }
+
+    console.log('Data saved successfully:', result);
+  });
+
   io.emit('mqttMessage', message.toString());
 });
 
@@ -144,9 +165,29 @@ io.on('connection', function (socket) {
   console.log('A client connected');
 
   socket.on('mqttMessage', function (message) {
+    // Convert the message to a JSON object
+    const mqttData = JSON.parse(message);
+
+    // Save the data to the MySQL database (similar to the previous code snippet)
+    const dataToSave = mqttData.dataToSave;
+    const query = `INSERT INTO data_realtime (viewer) VALUES (?)`;
+    const values = [dataToSave];
+
+    // Execute the SQL query
+    connection.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        return;
+      }
+
+      console.log('Data saved successfully:', result);
+    });
+
     socket.emit('mqttMessage', message);
   });
 });
+
+
 
 // Start the server
 server.listen(port, () => {
